@@ -72,8 +72,8 @@ helm version
 ### 1. Clone the repo
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/self-healing-k8s.git
-cd self-healing-k8s
+git clone https://github.com/aristematic/Auto-Healing-Infrasystem.git
+cd Auto-Healing-Infrasystem
 ```
 
 ### 2. Deploy monitoring stack
