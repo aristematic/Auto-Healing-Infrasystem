@@ -1,0 +1,53 @@
+# autoscaling/hpa-demo.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: php-apache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: php-apache
+  template:
+    metadata:
+      labels:
+        app: php-apache
+    spec:
+      containers:
+      - name: php-apache
+        image: registry.k8s.io/hpa-example
+        resources:
+          requests:
+            cpu: 200m
+          limits:
+            cpu: 500m
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: php-apache
+spec:
+  selector:
+    app: php-apache
+  ports:
+  - port: 80
+    targetPort: 80
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: php-apache
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: php-apache
+  minReplicas: 1
+  maxReplicas: 5
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50

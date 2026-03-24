@@ -1,0 +1,12 @@
+# chaos-tests/cpu-load.yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: chaos-load
+spec:
+  containers:
+  - name: chaos-load
+    image: busybox:1.28
+    command: ["/bin/sh"]
+    args: ["-c", "while true; do wget -q -O- http://php-apache; sleep 0.01; done"]
+  restartPolicy: Never

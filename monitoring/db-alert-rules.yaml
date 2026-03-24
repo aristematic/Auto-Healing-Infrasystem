@@ -1,0 +1,26 @@
+# monitoring/db-alert-rules.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: db-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: db.rules
+    rules:
+    - alert: PostgresPrimaryDown
+      expr: kube_pod_status_ready{condition="true", pod=~"postgres-primary.*"} == 0
+      for: 30s
+      labels:
+        severity: critical
+      annotations:
+        message: 'Postgres primary is down — triggering failover'
+    - alert: PostgresReplicaDown
+      expr: kube_pod_status_ready{condition="true", pod=~"postgres-replica.*"} == 0
+      for: 30s
+      labels:
+        severity: warning
+      annotations:
+        message: 'Postgres replica is down'

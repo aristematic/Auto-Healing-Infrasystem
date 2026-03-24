@@ -1,0 +1,31 @@
+# database/postgres-replica.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-replica
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      role: replica
+  template:
+    metadata:
+      labels:
+        app: postgres
+        role: replica
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "postgres123"
+        - name: POSTGRES_DB
+          value: "mydb"
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi 

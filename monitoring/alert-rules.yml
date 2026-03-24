@@ -1,0 +1,33 @@
+# monitoring/alert-rules.yaml
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: crash-alerts
+  namespace: monitoring
+  labels:
+    release: monitoring
+spec:
+  groups:
+  - name: pod.rules
+    rules:
+    - alert: PodCrashLooping
+      expr: rate(kube_pod_container_status_restarts_total[5m]) * 300 > 0
+      for: 1m
+      labels:
+        severity: critical
+      annotations:
+        message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} crash looping'
+    - alert: PodNotReady
+      expr: kube_pod_status_ready{condition="true"} == 0
+      for: 2m
+      labels:
+        severity: warning
+      annotations:
+        message: 'Pod {{ $labels.namespace }}/{{ $labels.pod }} not ready for 2 mins'
+    - alert: HighCPUUsage
+      expr: avg(rate(container_cpu_usage_seconds_total[2m])) by (pod) > 0.80
+      for: 1m
+      labels:
+        severity: warning
+      annotations:
+        message: 'Pod {{ $labels.pod }} CPU > 80%'

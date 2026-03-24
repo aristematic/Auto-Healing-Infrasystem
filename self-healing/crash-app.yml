@@ -1,0 +1,30 @@
+# self-healing/crash-app.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crash-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: crash-app
+  template:
+    metadata:
+      labels:
+        app: crash-app
+    spec:
+      containers:
+      - name: crash-app
+        image: busybox:1.28
+        command: ["/bin/sh"]
+        args: ["-c", "sleep 30 && exit 1"]
+        livenessProbe:
+          exec:
+            command: ["cat", "/tmp/healthy"]
+          initialDelaySeconds: 5
+          periodSeconds: 5
+          failureThreshold: 3
+        resources:
+          requests:
+            cpu: 100m
+            memory: 64Mi

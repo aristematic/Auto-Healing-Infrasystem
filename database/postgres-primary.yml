@@ -1,0 +1,43 @@
+# database/postgres-primary.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-primary
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+      role: primary
+  template:
+    metadata:
+      labels:
+        app: postgres
+        role: primary
+    spec:
+      containers:
+      - name: postgres
+        image: postgres:15
+        env:
+        - name: POSTGRES_PASSWORD
+          value: "postgres123"
+        - name: POSTGRES_DB
+          value: "mydb"
+        ports:
+        - containerPort: 5432
+        resources:
+          requests:
+            cpu: 100m
+            memory: 256Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: postgres-svc
+spec:
+  selector:
+    app: postgres
+    role: primary
+  ports:
+  - port: 5432
+    targetPort: 5432

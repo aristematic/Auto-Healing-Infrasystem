@@ -1,0 +1,35 @@
+# monitoring/alertmanager-slack.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: alertmanager-monitoring-kube-prometheus-alertmanager
+  namespace: monitoring
+stringData:
+  alertmanager.yaml: |
+    global:
+      slack_api_url: 'YOUR_SLACK_WEBHOOK_URL'
+    route:
+      group_by: ['alertname', 'namespace']
+      group_wait: 10s
+      group_interval: 5m
+      repeat_interval: 1h
+      receiver: 'slack-alerts'
+      routes:
+      - match:
+          severity: critical
+        receiver: 'slack-alerts'
+      - match:
+          severity: warning
+        receiver: 'slack-alerts'
+    receivers:
+    - name: 'slack-alerts'
+      slack_configs:
+      - channel: '#k8s-alerts'
+        title: 'K8s Alert - {{ .CommonLabels.alertname }}'
+        text: |
+          *Severity:* {{ .CommonLabels.severity }}
+          *Namespace:* {{ .CommonLabels.namespace }}
+          *Pod:* {{ .CommonLabels.pod }}
+          *Message:* {{ range .Alerts }}{{ .Annotations.message }}{{ end }}
+        send_resolved: true
+        

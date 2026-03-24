@@ -1,0 +1,5 @@
+*-secret.yaml
+*.env
+.env*
+.DS_Store
+Thumbs.db
